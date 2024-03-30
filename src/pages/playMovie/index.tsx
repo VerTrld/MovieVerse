@@ -8,12 +8,13 @@ export default function index() {
 
   return (
     <>
-      <Flex direction={"column"} justify={"center"} p={40}>
-        <AspectRatio>
+      <Flex direction={"column"} justify={"center"}>
+        <AspectRatio h={500}>
           <iframe
             src={`https://vidsrc.to/embed/movie/${id}`}
-            title="Movie"
-            style={{ width: 720, height: 500, border: 0 }}
+            title="YouTube video player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
           />
         </AspectRatio>
       </Flex>
