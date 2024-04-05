@@ -56,7 +56,20 @@ export default function Home() {
           justify={"space-between"}
           align={"center"}
         >
-          <Title>MovieVerse</Title>
+          <Title
+            style={{
+              display: "flex",
+              flexDirection: "row",
+
+              borderRadius: "5px",
+            }}
+          >
+            CineVerse
+            <Text size="12px" style={{ letterSpacing: "3px" }}>
+              FREE
+            </Text>
+          </Title>
+
           <Input
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
