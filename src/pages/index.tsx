@@ -1,6 +1,19 @@
-import { Flex, Grid, Image, Input, Title, Button, Text } from "@mantine/core";
+import {
+  Flex,
+  Grid,
+  Image,
+  Input,
+  Title,
+  Button,
+  Text,
+  Divider,
+  Box,
+} from "@mantine/core";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Carousel } from "@mantine/carousel";
+import { IconArrowRight, IconArrowLeft, IconFlame } from "@tabler/icons-react";
+import Autoplay from "embla-carousel-autoplay";
 
 interface Movie {
   id: number;
@@ -12,8 +25,10 @@ interface Movie {
 
 export default function Home() {
   const [movieList, setMovieList] = useState<Movie[]>([]);
+  const [trendingList, setTrendingList] = useState<Movie[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
+  const autoplay = useRef(Autoplay({ delay: 3000 }));
 
   const router = useRouter();
 
@@ -29,7 +44,8 @@ export default function Home() {
 
         const response = await fetch(url);
         const data = await response.json();
-        setMovieList(data.results);
+        setTrendingList(data.results);
+
         console.log(data);
       } catch (error) {
         console.error("Error fetching movies:", error);
@@ -38,6 +54,19 @@ export default function Home() {
 
     fetchMovies();
   }, [searchTerm, page]);
+
+  useEffect(() => {
+    const carousel = async () => {
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/discover/movie?api_key=be7a1480a6d224eefbbe288a47523559&page=${page}`
+        );
+        const data = await response.json();
+        setMovieList(data.results);
+      } catch (error) {}
+    };
+    carousel();
+  }, []);
 
   return (
     <>
@@ -62,6 +91,10 @@ export default function Home() {
               flexDirection: "row",
 
               borderRadius: "5px",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = "/";
             }}
           >
             CineVerse
@@ -72,62 +105,136 @@ export default function Home() {
 
           <Input
             value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1); // Reset page to 1 when performing a new search
+            }}
             placeholder="Search movies..."
             style={{ width: 400 }}
           />
         </Flex>
-
-        <Grid pt={50}>
-          {movieList.map((movie, index) => (
-            <Grid.Col span={{ base: 6, md: 2, lg: 2, xl: 2 }} key={index}>
-              {movie.poster_path ? (
-                <Flex
-                  direction={"column"}
-                  style={{ textAlign: "center", color: "white" }}
-                >
-                  <Image
-                    src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    alt=""
-                    width={50}
-                    height={300}
-                    style={{ cursor: "pointer", borderRadius: 10 }} // Apply cursor style here
-                    onClick={() => {
-                      console.log(`https://vidsrc.to/embed/movie/${movie.id}`);
-                      router.push({
-                        pathname: "/playMovie",
-                        query: {
-                          id: movie.id,
-                        },
-                      });
-                    }}
-                  />
-
-                  <Title order={6}>
-                    {movie.title} {new Date(movie.release_date).getFullYear()}
-                  </Title>
-                </Flex>
-              ) : (
-                <Text>No poster available</Text>
-              )}
-            </Grid.Col>
-          ))}
-        </Grid>
-        <Flex direction={"row"} justify={"center"} gap={10} p={30}>
-          <Button
-            onClick={() => {
-              setPage((prevPage) => prevPage - 1);
-            }}
+        {!searchTerm.trim() && page === 1 ? (
+          <Carousel
+            // withIndicators
+            plugins={[autoplay.current]}
+            // onMouseEnter={autoplay.current.stop}
+            // onMouseLeave={autoplay.current.reset}
+            withIndicators
+            height={500}
+            slideSize="33.333333%"
+            slideGap="md"
+            loop
+            align="start"
+            slidesToScroll={3}
+            pb={50}
           >
-            Prev
-          </Button>
-          <Button
-            onClick={() => {
-              setPage((prevPage) => prevPage + 1);
-            }}
-          >
-            Next
-          </Button>
+            {movieList.map((m, i) => (
+              <Carousel.Slide key={i}>
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500/${m.poster_path}`}
+                  alt=""
+                  width={50}
+                  height={500}
+                  style={{ objectFit: "contain" }}
+                  // onClick={() => {
+                  //   console.log(`https://vidsrc.to/embed/movie/${movie.id}`);
+                  //   router.push({
+                  //     pathname: "/playMovie",
+                  //     query: {
+                  //       id: movie.id,
+                  //       page: page,
+                  //       st: searchTerm,
+                  //     },
+                  //   });
+                  // }}
+                />
+              </Carousel.Slide>
+            ))}
+          </Carousel>
+        ) : null}
+
+        <Flex
+          direction={"column"}
+          style={{
+            backgroundColor: "rgb(255, 255, 255, 0.1)",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          {!searchTerm.trim() && page === 1 ? (
+            <Title c={"white"} style={{ textAlign: "center", paddingTop: 50 }}>
+              <IconFlame size={30} />
+              Trending Now <IconFlame size={30} />
+            </Title>
+          ) : null}
+
+          <Grid pt={50}>
+            {trendingList.map((movie, index) => (
+              <Grid.Col span={{ base: 6, md: 2, lg: 2, xl: 2 }} key={index}>
+                {movie.poster_path ? (
+                  <Flex
+                    direction={"column"}
+                    style={{ textAlign: "center", color: "white" }}
+                  >
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                      alt=""
+                      width={50}
+                      height={300}
+                      style={{ cursor: "pointer", borderRadius: 10 }} // Apply cursor style here
+                      onClick={() => {
+                        console.log(
+                          `https://vidsrc.to/embed/movie/${movie.id}`
+                        );
+                        router.push({
+                          pathname: "/playMovie",
+                          query: {
+                            id: movie.id,
+                            page: page,
+                            st: searchTerm,
+                          },
+                        });
+                      }}
+                    />
+
+                    <Title order={6}>
+                      {movie.title} {new Date(movie.release_date).getFullYear()}
+                    </Title>
+                  </Flex>
+                ) : (
+                  <Box bg={"white"} h={300}>
+                    <Title ta={"center"} size={40}>
+                      Not available
+                    </Title>
+                  </Box>
+                )}
+              </Grid.Col>
+            ))}
+          </Grid>
+          <Flex direction={"row"} justify={"center"} gap={10} p={30}>
+            {page === 1 ? (
+              <Button disabled>Prev</Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  const nextPage = page - 1;
+                  setPage(nextPage);
+                  router.push(`/?Page=${nextPage}`);
+                }}
+              >
+                Prev
+              </Button>
+            )}
+
+            <Button
+              onClick={() => {
+                const nextPage = page + 1;
+                setPage(nextPage);
+                router.push(`/?Page=${nextPage}`);
+              }}
+            >
+              Next
+            </Button>
+          </Flex>
         </Flex>
       </Flex>
     </>
