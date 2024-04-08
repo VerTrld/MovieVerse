@@ -14,6 +14,9 @@ import { useEffect, useRef, useState } from "react";
 import { Carousel } from "@mantine/carousel";
 import { IconArrowRight, IconArrowLeft, IconFlame } from "@tabler/icons-react";
 import Autoplay from "embla-carousel-autoplay";
+import Head from "next/head";
+import { useMediaQuery } from "@mantine/hooks";
+import { match } from "assert";
 
 interface Movie {
   id: number;
@@ -31,6 +34,7 @@ export default function Home() {
   const autoplay = useRef(Autoplay({ delay: 3000 }));
 
   const router = useRouter();
+  const matches = useMediaQuery("(min-width: 720px)");
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -70,6 +74,16 @@ export default function Home() {
 
   return (
     <>
+      <Head>
+        <title>
+          CineVerse | Watch Movies Online Free on cineversefree.netlify.app
+        </title>
+        <meta
+          name="description"
+          content="The best place to watch movies online for free with HD quality. No registration is required!"
+        />
+      </Head>
+      <meta property="og:image" content="/images.jpg" />
       <Flex
         direction="column"
         bg={
@@ -119,13 +133,14 @@ export default function Home() {
             plugins={[autoplay.current]}
             // onMouseEnter={autoplay.current.stop}
             // onMouseLeave={autoplay.current.reset}
-            withIndicators
+            withIndicators={matches ? true : false}
             height={500}
-            slideSize="33.333333%"
+            slideSize={matches ? "33.333333%" : undefined}
             slideGap="md"
             loop
             align="start"
-            slidesToScroll={3}
+            slidesToScroll={matches ? 3 : 1}
+            pt={30}
             pb={50}
           >
             {movieList.map((m, i) => (

@@ -27,16 +27,17 @@ interface Movie {
 
 export default function Index() {
   const router = useRouter();
-  const { id, title } = router.query;
+  const { id, title, page } = router.query;
   const [movieOverview, setMovieOverview] = useState<Movie[]>([]);
   const [idMovie, setIdMovie] = useState(id);
   const [searchTerm, setSearchTerm] = useState(String(title));
-  const [page, setPage] = useState(1);
+  // const [page, setPage] = useState(1);
 
   useEffect(() => {
     setIdMovie(id);
   }, [id]);
 
+  console.log("page:", page);
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -102,17 +103,19 @@ export default function Index() {
             </Text>
           </Title>
 
-          {!searchTerm && (
-            <Input
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setPage(1); // Reset page to 1 when performing a new search
-              }}
-              placeholder="Search movies..."
-              style={{ width: 400 }}
-            />
-          )}
+          {!searchTerm ||
+            (!id && (
+              <Input
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  // setPage(1);
+                }}
+                placeholder="Search movies..."
+                style={{ width: 400 }}
+                hidden={false}
+              />
+            ))}
         </Flex>
         <AspectRatio ratio={1080 / 400} bg={"black"}>
           <iframe
@@ -130,7 +133,7 @@ export default function Index() {
             </Title>
           ) : (
             movieOverview.map((movie, index) => (
-              <Flex direction={"row"} pt={50} key={index}>
+              <Flex direction={"row"} p={50} key={index}>
                 <Flex direction={"column"}>
                   <Image
                     src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
