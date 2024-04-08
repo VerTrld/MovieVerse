@@ -4,6 +4,7 @@ import {
   Button,
   Flex,
   Image,
+  Input,
   Text,
   Title,
 } from "@mantine/core";
@@ -26,10 +27,11 @@ interface Movie {
 
 export default function Index() {
   const router = useRouter();
-  const { id, index, page } = router.query;
+  const { id, title } = router.query;
   const [movieOverview, setMovieOverview] = useState<Movie[]>([]);
   const [idMovie, setIdMovie] = useState(id);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(String(title));
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     setIdMovie(id);
@@ -63,7 +65,7 @@ export default function Index() {
     if (idMovie && page) {
       fetchMovies();
     }
-  }, [idMovie, page]);
+  }, [idMovie, page, searchTerm]);
   return (
     <>
       <Flex
@@ -99,6 +101,18 @@ export default function Index() {
               FREE
             </Text>
           </Title>
+
+          {!searchTerm && (
+            <Input
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1); // Reset page to 1 when performing a new search
+              }}
+              placeholder="Search movies..."
+              style={{ width: 400 }}
+            />
+          )}
         </Flex>
         <AspectRatio ratio={1080 / 400} bg={"black"}>
           <iframe
@@ -116,7 +130,7 @@ export default function Index() {
             </Title>
           ) : (
             movieOverview.map((movie, index) => (
-              <Flex direction={"row"} pt={50}>
+              <Flex direction={"row"} pt={50} key={index}>
                 <Flex direction={"column"}>
                   <Image
                     src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
