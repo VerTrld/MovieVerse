@@ -3,11 +3,13 @@ import {
   Box,
   Button,
   Flex,
+  Grid,
   Image,
   Input,
   Text,
   Title,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -32,6 +34,7 @@ export default function Index() {
   const [idMovie, setIdMovie] = useState(id);
   const [searchTerm, setSearchTerm] = useState(String(title));
   // const [page, setPage] = useState(1);
+  const matches = useMediaQuery("(min-width: 720px)");
 
   useEffect(() => {
     setIdMovie(id);
@@ -74,7 +77,7 @@ export default function Index() {
         bg={
           "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)"
         }
-        style={{ flex: 1 }}
+        style={{ minHeight: "100vh" }}
       >
         <Flex
           direction={"row"}
@@ -117,7 +120,7 @@ export default function Index() {
               />
             ))}
         </Flex>
-        <AspectRatio ratio={1080 / 400} bg={"black"}>
+        <AspectRatio ratio={1080 / (matches ? 400 : 900)} bg={"black"}>
           <iframe
             src={`https://vidsrc.to/embed/movie/${id}`}
             title="YouTube video player"
@@ -133,94 +136,95 @@ export default function Index() {
             </Title>
           ) : (
             movieOverview.map((movie, index) => (
-              <Flex direction={"row"} p={50} key={index}>
-                <Flex direction={"column"}>
-                  <Image
-                    src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    alt=""
-                    style={{ width: "200px" }}
-                  />
-                  <Title size={"sm"} c={"yellow"} ta={"center"}>
-                    {movie.vote_average}
-                  </Title>
-                </Flex>
-
-                <Flex direction={"column"} c={"white"} pl={20}>
-                  <Title ta={"center"}>{movie.title}</Title>
-                  <Text>{movie.overview}</Text>
-                  <Flex direction={"row"}>
-                    Genre:
-                    {movie.genre_ids.map((v) => {
-                      let genreName;
-                      switch (v) {
-                        case 28:
-                          genreName = "Action";
-                          break;
-                        case 12:
-                          genreName = "Adventure";
-                          break;
-                        case 16:
-                          genreName = "Animation";
-                          break;
-                        case 35:
-                          genreName = "Comedy";
-                          break;
-                        case 80:
-                          genreName = "Crime";
-                          break;
-                        case 99:
-                          genreName = "Documentary";
-                          break;
-                        case 18:
-                          genreName = "Drama";
-                          break;
-                        case 10751:
-                          genreName = "Family";
-                          break;
-                        case 14:
-                          genreName = "Fantasy";
-                          break;
-                        case 36:
-                          genreName = "History";
-                          break;
-                        case 27:
-                          genreName = "Horror";
-                          break;
-                        case 10402:
-                          genreName = "Music";
-                          break;
-                        case 9648:
-                          genreName = "Mystery";
-                          break;
-                        case 10749:
-                          genreName = "Romance";
-                          break;
-                        case 878:
-                          genreName = "Science Fiction";
-                          break;
-                        case 10770:
-                          genreName = "TV Movie";
-                          break;
-                        case 53:
-                          genreName = "Thriller";
-                          break;
-                        case 10752:
-                          genreName = "War";
-                          break;
-                        case 37:
-                          genreName = "Western";
-                          break;
-                        default:
-                          genreName = ""; // Handle unknown genre IDs
-                      }
-                      return <Text key={v}>{genreName}</Text>;
-                    })}
-                  </Flex>
-                  <Text>Date Release: {movie.release_date}</Text>
-                  <Text>Popular: {movie.popularity}</Text>
-                  <Text>Vote Count: {movie.vote_count}</Text>
-                </Flex>
-              </Flex>
+              <Box p={20}>
+                <Grid key={index} c={"white"}>
+                  <Grid.Col span={{ base: 5.5, md: 2.5, lg: 2.5 }}>
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                      alt=""
+                      style={{ width: "200px" }}
+                    />
+                    <Title size={"sm"} c={"yellow"} ta={"center"}>
+                      {movie.vote_average}
+                    </Title>
+                  </Grid.Col>
+                  <Grid.Col span={{ base: 10, md: 8, lg: 8 }}>
+                    <Title>{movie.title}</Title>
+                    <Text>{movie.overview}</Text>
+                    <Flex direction={"row"}>
+                      Genre:
+                      {movie.genre_ids.map((v) => {
+                        let genreName;
+                        switch (v) {
+                          case 28:
+                            genreName = "Action";
+                            break;
+                          case 12:
+                            genreName = "Adventure";
+                            break;
+                          case 16:
+                            genreName = "Animation";
+                            break;
+                          case 35:
+                            genreName = "Comedy";
+                            break;
+                          case 80:
+                            genreName = "Crime";
+                            break;
+                          case 99:
+                            genreName = "Documentary";
+                            break;
+                          case 18:
+                            genreName = "Drama";
+                            break;
+                          case 10751:
+                            genreName = "Family";
+                            break;
+                          case 14:
+                            genreName = "Fantasy";
+                            break;
+                          case 36:
+                            genreName = "History";
+                            break;
+                          case 27:
+                            genreName = "Horror";
+                            break;
+                          case 10402:
+                            genreName = "Music";
+                            break;
+                          case 9648:
+                            genreName = "Mystery";
+                            break;
+                          case 10749:
+                            genreName = "Romance";
+                            break;
+                          case 878:
+                            genreName = "Science Fiction";
+                            break;
+                          case 10770:
+                            genreName = "TV Movie";
+                            break;
+                          case 53:
+                            genreName = "Thriller";
+                            break;
+                          case 10752:
+                            genreName = "War";
+                            break;
+                          case 37:
+                            genreName = "Western";
+                            break;
+                          default:
+                            genreName = ""; // Handle unknown genre IDs
+                        }
+                        return <Text key={v}>{genreName}</Text>;
+                      })}
+                    </Flex>
+                    <Text>Date Release: {movie.release_date}</Text>
+                    <Text>Popular: {movie.popularity}</Text>
+                    <Text>Vote Count: {movie.vote_count}</Text>
+                  </Grid.Col>
+                </Grid>
+              </Box>
             ))
           )}
         </Flex>
