@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { Carousel } from "@mantine/carousel";
 import { IconArrowRight, IconArrowLeft, IconFlame } from "@tabler/icons-react";
 import Autoplay from "embla-carousel-autoplay";
+import Head from "next/head";
 
 interface Movie {
   id: number;
@@ -70,6 +71,15 @@ export default function Home() {
 
   return (
     <>
+      <Head>
+        <title>
+          CineVerse | Watch Movies Online Free on cineversefree.netlify.app
+        </title>
+        <meta
+          name="description"
+          content="The best place to watch movies online for free with HD quality. No registration is required!"
+        />
+      </Head>
       <Flex
         direction="column"
         bg={
