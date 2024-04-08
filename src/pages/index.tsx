@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { Carousel } from "@mantine/carousel";
 import { IconArrowRight, IconArrowLeft, IconFlame } from "@tabler/icons-react";
 import Autoplay from "embla-carousel-autoplay";
+import { useMediaQuery } from "@mantine/hooks";
 
 interface Movie {
   id: number;
@@ -31,6 +32,7 @@ export default function Home() {
   const autoplay = useRef(Autoplay({ delay: 3000 }));
 
   const router = useRouter();
+  const matches = useMediaQuery("(min-width: 720px)");
 
   useEffect(() => {
     const fetchMovies = async () => {
