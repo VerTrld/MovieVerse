@@ -136,8 +136,8 @@ export default function Index() {
             </Title>
           ) : (
             movieOverview.map((movie, index) => (
-              <Box p={20}>
-                <Grid key={index} c={"white"}>
+              <Box p={20} key={index}>
+                <Grid c={"white"}>
                   <Grid.Col span={{ base: 5.5, md: 2.5, lg: 2.5 }}>
                     <Image
                       src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
