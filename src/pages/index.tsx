@@ -26,15 +26,28 @@ interface Movie {
   // Add other properties if needed
 }
 
+interface ImdIDItem {
+  imdb_id: string; // Assuming imdb_id is a string; adjust if needed
+  // Add other properties if needed
+}
+
+interface ImdIDResult {
+  result: {
+    items: ImdIDItem[];
+  };
+}
+
 export default function Home() {
   const [movieList, setMovieList] = useState<Movie[]>([]);
   const [trendingList, setTrendingList] = useState<Movie[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
   const autoplay = useRef(Autoplay({ delay: 3000 }));
 
   const router = useRouter();
   const matches = useMediaQuery("(min-width: 720px)");
+
+  const [imdID, setImdID] = useState<ImdIDResult | null>(null);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -49,7 +62,6 @@ export default function Home() {
         const response = await fetch(url);
         const data = await response.json();
         setTrendingList(data.results);
-
         console.log(data);
       } catch (error) {
         console.error("Error fetching movies:", error);
@@ -67,11 +79,69 @@ export default function Home() {
         );
         const data = await response.json();
         setMovieList(data.results);
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error fetching carousel movies:", error);
+      }
     };
     carousel();
   }, [page]);
 
+  useEffect(() => {
+    const vidsrc = async () => {
+      try {
+        const response = await fetch(`https://vidsrc.to/vapi/movie/new`);
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching Vidsrc data:", error);
+      }
+    };
+    vidsrc();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const vidsrcResponse = await fetch("https://vidsrc.to/vapi/movie/new");
+        const vidsrcData = await vidsrcResponse.json();
+        console.log("Vidsrc Data:", vidsrcData);
+        setImdID(vidsrcData);
+
+        if (vidsrcData.result) {
+          const filteredItems = vidsrcData.result.items.filter(
+            (item: ImdIDItem) => item.imdb_id
+          );
+
+          const tmdbIds = filteredItems.map((item: ImdIDItem) => item.imdb_id);
+
+          console.log("Filtered items with imdb_id:", filteredItems);
+          console.log("TMDB IDs:", tmdbIds);
+
+          const tmdbOptions = {
+            method: "GET",
+            headers: {
+              accept: "application/json",
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiZTdhMTQ4MGE2ZDIyNGVlZmJiZTI4OGE0NzUyMzU1OSIsInN1YiI6IjY2MDY2MzFhZDRmZTA0MDE3YzI3NjgwYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.C-NYv1uqJPI-ozpzlYxYlegp_5MG55YAoZ1VngYhg9s",
+            },
+          };
+
+          if (tmdbIds.length > 0) {
+            const tmdbResponse = await fetch(
+              `https://api.themoviedb.org/3/find/${tmdbIds[0]}?external_source=imdb_id`,
+              tmdbOptions
+            );
+            const tmdbData = await tmdbResponse.json();
+            console.log("TMDb Data:", tmdbData);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [imdID]);
   return (
     <>
       <Head>

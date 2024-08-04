@@ -122,14 +122,121 @@ export default function Index() {
         </Flex>
         <AspectRatio ratio={1080 / (matches ? 400 : 900)} bg={"black"}>
           <iframe
-            src={`https://vidsrc.to/embed/movie/${id}`}
+            // src={`https://vidsrc.to/embed/movie/${id}`}
+            src={`https://vidsrc.cc/v2/embed/movie/${id}`}
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
         </AspectRatio>
 
-        <Flex direction={"row"} justify={"space-between"}>
+        <Flex direction={"row"} p={20} w={"100%"} h={"100%"} c={"white"}>
+          {movieOverview.length === 0 ? (
+            <Title size={"md"} pl={4}>
+              No Info found
+            </Title>
+          ) : (
+            movieOverview.map((movie, index) => (
+              <>
+                <Flex
+                  direction={"row"}
+                  gap={50}
+                  wrap={"wrap"}
+                  justify={"center"}
+                >
+                  <Flex direction={"column"}>
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                      alt=""
+                      style={{ width: "200px" }}
+                    />
+                    <Title size={"sm"} c={"yellow"} ta={"center"}>
+                      {movie.vote_average}
+                    </Title>
+                  </Flex>
+
+                  <Flex direction={"column"} w={"50%"}>
+                    <Title>{movie.title}</Title>
+                    <Text>{movie.overview}</Text>
+                    <Flex direction={"row"} wrap={"wrap"}>
+                      Genre:
+                      {movie.genre_ids.map((v) => {
+                        let genreName;
+                        switch (v) {
+                          case 28:
+                            genreName = "Action";
+                            break;
+                          case 12:
+                            genreName = "Adventure";
+                            break;
+                          case 16:
+                            genreName = "Animation";
+                            break;
+                          case 35:
+                            genreName = "Comedy";
+                            break;
+                          case 80:
+                            genreName = "Crime";
+                            break;
+                          case 99:
+                            genreName = "Documentary";
+                            break;
+                          case 18:
+                            genreName = "Drama";
+                            break;
+                          case 10751:
+                            genreName = "Family";
+                            break;
+                          case 14:
+                            genreName = "Fantasy";
+                            break;
+                          case 36:
+                            genreName = "History";
+                            break;
+                          case 27:
+                            genreName = "Horror";
+                            break;
+                          case 10402:
+                            genreName = "Music";
+                            break;
+                          case 9648:
+                            genreName = "Mystery";
+                            break;
+                          case 10749:
+                            genreName = "Romance";
+                            break;
+                          case 878:
+                            genreName = "Science Fiction";
+                            break;
+                          case 10770:
+                            genreName = "TV Movie";
+                            break;
+                          case 53:
+                            genreName = "Thriller";
+                            break;
+                          case 10752:
+                            genreName = "War";
+                            break;
+                          case 37:
+                            genreName = "Western";
+                            break;
+                          default:
+                            genreName = ""; // Handle unknown genre IDs
+                        }
+                        return <Text key={v}>{genreName}</Text>;
+                      })}
+                    </Flex>
+                    <Text>Date Release: {movie.release_date}</Text>
+                    <Text>Popular: {movie.popularity}</Text>
+                    <Text>Vote Count: {movie.vote_count}</Text>
+                  </Flex>
+                </Flex>
+              </>
+            ))
+          )}
+        </Flex>
+
+        {/* <Flex direction={"row"} justify={"space-between"}>
           {movieOverview.length === 0 ? (
             <Title size={"md"} pl={4}>
               No Info found
@@ -227,7 +334,7 @@ export default function Index() {
               </Box>
             ))
           )}
-        </Flex>
+        </Flex> */}
       </Flex>
     </>
   );
